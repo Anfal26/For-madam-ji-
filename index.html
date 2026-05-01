@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Small Gift for Sameen</title>
+    <style>
+        /* --- CORE STYLES --- */
+        :root {
+            --bg-color: #fdfaf6; /* Warm cream */
+            --primary-text: #5d4037; /* Soft espresso */
+            --accent-color: #e57373; /* Blush red */
+            --accent-hover: #ef5350; /* Deep blush */
+            --font-main: 'Great Vibes', cursive; /* Elegant Calligraphy font */
+            --font-body: 'Cormorant Garamond', serif; /* Classic Body Font */
+        }
+
+        /* Loading Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Great+Vibes&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            color: var(--primary-text);
+            font-family: var(--font-body);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px; /* Essential for slide transitions */
+        }
+
+        /* --- SLIDE CONTAINER --- */
+        .slide-container {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            height: 80vh;
+            max-height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- BASIC SLIDE STYLE --- */
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            padding: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transform: rotateY(90deg); /* Start rotated for flip animation */
+            transition: transform 0.8s ease-out, opacity 0.6s ease-out;
+            pointer-events: none; /* Can't click hidden slides */
+        }
+
+        /* THEME: lovely color for my love */
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border: 2px solid rgba(229, 115, 115, 0.2); /* Soft blush border */
+            border-radius: 15px;
+            pointer-events: none;
+        }
+
+        /* The ACTIVE slide */
+        .slide.active {
+            opacity: 1;
+            transform: rotateY(0deg);
+            pointer-events: auto;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        .main-message {
+            font-family: var(--font-main);
+            font-size: 2.8rem;
+            line-height: 1.3;
+            margin-bottom: 30px;
+            color: var(--accent-color);
+        }
+
+        .sub-message {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        /* Highlight special words, maintaining exact spelling */
+        .highlight {
+            font-weight: 600;
+            color: var(--accent-hover);
+        }
+
+        /* --- INTERACTIVE ELEMENTS (GIFTS, EMOJIS, BUTTONS) --- */
+        .icon-group {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .gift-icon, .action-emoji, .decision-icon {
+            font-size: 4rem;
+            cursor: pointer;
+            transition: transform 0.3s ease, filter 0.3s ease;
+            filter: grayscale(20%); /* Soften the colors initially */
+        }
+
+        .gift-icon:hover, .action-emoji:hover, .decision-icon:hover {
+            transform: scale(1.15);
+            filter: grayscale(0%);
+        }
+
+        /* "A cring Emoji" [sic] instruction interpreted as 😢 */
+        .cring-emoji {
+            font-size: 6rem;
+            margin-bottom: 20px;
+        }
+
+        /* Generic Proceed/Next Button Style */
+        .proceed-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-family: var(--font-body);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .proceed-btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Cuteness Meter Styles (Slide 7) */
+        .meter-container {
+            width: 100%;
+            max-width: 400px;
+            height: 25px;
+            background-color: #eee;
+            border-radius: 15px;
+            overflow: visible; /* CRITICAL for the "exceeded" effect */
+            position: relative;
+            margin: 20px 0
+            border: 1px solid #ccc;
+        }
+
+        .meter-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), #ff8a80);
+            border-radius: 15px;
+            width: 0%; /* Start empty */
+            transition: width 2s ease-out; /* Slow fill */
+            position: relative;
+        }
+
+        /* The 100% text animation */
+        .meter-bar::after {
+            content: '❤️ OVERFLOW! ❤️';
+            position: absolute;
+            right: -130px; /* Push past 100% */
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: bold;
+            color: white;
+            white-space: nowrap;
+            background-color: var(--accent-hover);
+            padding: 2px 8px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.5s ease 2s; /* Fade in after bar fills */
+        }
+
+        /* Photo Reveal Style (Slide 10) */
+        .photo-frame {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background-color: #eee;
+            background-size: cover;
+            background-position: center;
+            border: 8px solid white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="slide-container">
+
+        <div class="slide active" id="slide1">
+            <h1 class="main-message">Dear Madam Ji❤️❤️ (<span class="highlight">Sameennnnnnnnnn</span>),</h1>
+            <p class="sub-message">A Small gift is waiting for you.</p>
+            <p class="sub-message">Please click  the gift icon to proceeddd</p>
+            <p class="sub-message">PLzzzzzzzzzzzz</p>
+            <div class="icon-group">
+                <div class="gift-icon" onclick="nextSlide('giftA')">🎁</div>
+                <div class="gift-icon" onclick="nextSlide('giftB')">🎁</div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide2">
+            <h1 class="main-message">AP na Jis button ko press kiya ha iusss mai, Ap seh pyar krne wale <span class="highlight">na AP</span> Keliya Kuch lika haii....</h1>
+            <button class="proceed-btn" onclick="nextSlide()">Tap to Proceeedddd</button>
+        </div>
+
+        <div class="slide" id="slide3">
+            <h1 class="main-message">I hope so you are fine. I have wrote this for you, Just to make suree that, you still know that, I love youuuuuu🥰❤️.</h1>
+            <button class="proceed-btn" onclick="nextSlide()">Tap to Proceeedddd</button>
+        </div>
+
+        <div class="slide" id="slide4">
+            <p class="sub-message">Asa nahi hai ki mai phale karta tha aur . .</p>
+            <p class="sub-message">Ab nahii karta . . .</p>
+            <h1 class="main-message">Tum seh <span class="highlight">muhbaat</span> shyd khabi khatam yah Phir yeh <span class="highlight">muhbaattt</span> muhbaat khabi bhi khatam nahi hogee.  mujhe lahgta yeh aur bhi baadti ja rahi ha wakt keh sath sth 😅😅😅. . . .</h1>
+            <button class="proceed-btn" onclick="nextSlide()">Tap to Proceed</button>
+        </div>
+
+        <div class="slide" id="slide5">
+            <h1 class="main-message">Yeh <span class="highlight">Khud likha hai</span> . . . . suchh maii ☺️☺️☺️, lykin time bohot gaya😂😂😁. . . .</h1>
+            <p class="sub-message">Iss seh pehli wali slide mai shyd kuch ziyda hi filmy hogaya agar toda bhi bura laga hou tou maaf karna . . . . . . Bakii . . . Aur bhii slides hai agay cheack karooooo . . .😅😅😅😅😅😂😁. . .</p>
+            
+            <div class="icon-group">
+                <div class="decision-icon" id="heartButton" onclick="nextSlide('proceedTo6')">❤️</div>
+                <div class="decision-icon" onclick="specialAction('cross')">❌</div>
+            </div>
+            <p class="sub-message" style="margin-top: 15px;">If you are interested Plz tap the heart iconnn . . . .<br>If you are not than tap the cross icon . . .</p>
+        </div>
+
+        <div class="slide" id="slide5_loop">
+            <div class="cring-emoji">😢</div>
+            <h1 class="main-message">Tap to go back, your <span class="highlight">Aashiq</span> is not satisfied with this decision . . . . ☺️☺️☺️☺️☺️ . . .</h1>
+            <button class="proceed-btn" onclick="specialAction('backTo5')">Tap to go back</button>
+        </div>
+
+        <div class="slide" id="slide6">
+            <h1 class="main-message">uffffffffffffffff, thank youuu for tapping the button which I’really want . . . .</h1>
+            <p class="sub-message">Tumhse harr wakt baaat krna ka mahnn tou Krtaa, magr pata nahii kis waja sai nahii karta .....yeh baat mujhe bhi Sahii seh nahii Pata . . .</p>
+            <h1 class="main-message">Haar wakt chahta hu ki Ab msg karunga aur bohot Saari baatain Karunga ga tumhare sath pr Pata nahii Q Rukh jata huuu . . . .</h1>
+            <button class="proceed-btn" onclick="nextSlide()">Tap here to proceeedddd . . .</button>
+        </div>
+
+        <div class="slide" id="slide7">
+            <p class="sub-message">Everyone says cuteness has limits . . . .</p>
+            <h1 class="main-message">But for me, your cuteness limit is . . . . .</h1>
+            
+            <div class="action-emoji" onclick="startMeter()">😍</div>
+            <p class="sub-message">Tap here to know</p>
+
+            <div class="meter-container">
+                <div class="meter-bar" id="cutenessBar"></div>
+            </div>
+
+            <h1 class="main-message" id="exceededText" style="opacity: 0; transition: opacity 1s ease 2.5s;">
+                You’re cuteness level exceededd in the heart of your Mahshook.
+            </h1>
+            
+            <button class="proceed-btn" id="slide7proceed" style="display: none;" onclick="nextSlide()">Taphere</button>
+        </div>
+
+        <div class="slide" id="slide8">
+            <h1 class="main-message">Jab khabi bhi hamarhe bheech mai, Ek second yah phir luss sa bhi kam wakt, Kai liya eye contact hota hai toy, Asa lagta hai ki tumhari Jo Ankhain hai wo mujhe iun mai maghan hone ki dawat deh rahi  hai . . . .</h1>
+            <p class="sub-message">Magar Pata nahij😂😂i mai kis tarah apni inn ankhuun ko Sambhalta hu . . . .</p>
+            <h1 class="main-message">Lykin wo lamhaatt mera liya din kee bahtaren lamhaaat ban jata ha... sorryy toda ziyda hi filmimg hogaya uper wala sentence...lykin shyd succh hai🥰❤️🌹 . . .</h1>
+            <button class="proceed-btn" onclick="nextSlide()">Tap for next</button>
+        </div>
+
+        <div class="slide" id="slide9">
+            <div class="action-emoji" onclick="nextSlide()">😊</div>
+            <p class="sub-message">Tap the smile face to proceeddd . . . . .</p>
+
+            <p class="sub-message">Pata nalili . . yeh saab baatein tumhe psnd bhi ayengi ya nahi . magar Jo bhi likha ha dil sel likha ha, Dimag ko side peh vakh keh ☺️😂😂😂😂☺️ . . . chahe wo filmy ho ya Romantic-Sabbbbbbbbbb . . .</p>
+            <h1 class="main-message">Yaha tak tum mera sath hou Iss baat ki celebration ton bantii hai</h1>
+            
+            <div class="action-emoji" onclick="specialAction('showHeart')">❤️</div>
+            <p class="sub-message">Tap the heart.</p>
+        </div>
+
+        <div class="slide" id="slide10">
+            <p class="sub-message"> yeh photo yaad hai.... . . iuss din iuss wakt dilki dadkaano ki speed bhot taaz hogayi thi....shyd wo lammha mujhe zindagee bar yaad rahega.</p>
+            
+            <div class="photo-frame" id="photoFrame" style="background-image: url('YOUR_IMAGE_URL_HERE');" onclick="nextSlide()"></div>
+            
+            <p class="sub-message" style="margin-top: 10px;">(Tap the photo to proceed)</p>
+        </div>
+
+        <div class="slide" id="slide11">
+            <p class="sub-message">Aurrrr . . . . .</p>
+            <h1 class="main-message">Bohot kuch yaha peh kehna wala tha....lykin . . . .</h1>
+            <p class="sub-message">  soccha yeh hi paad keh shyd mujhe maar daalegee... lykin baadi himakaat kar keh yeh sab kuch likha ha😂😂❤️‍🩹🫩. . .</p>
+            <h1 class="main-message">chalo bakiii . . . . . .</h1>
+            <div class="icon-group">
+                <div class="decision-icon">☺️</div>
+                <div class="decision-icon">☺️</div>
+                <div class="decision-icon">❤️</div>
+            </div>
+            <button class="proceed-btn" onclick="nextSlide()">Tap for next</button>
+        </div>
+
+        <div class="slide" id="slide12">
+            <h1 class="main-message">Apna kayal rakho nah . . . . Aj kal kheli dawayiooun keh hi snaps send kartii hou . . . Wakt peh Khana kawo, Ziyda stress nahii lo aur enjoy karo yrr . . . Ek hi zinadagee milii hai yeh tum seh pehle bhi kaha tha . . .</h1>
+            <h1 class="main-message">shyd 10 class mai ☺️☺️ . . . Mujhe yaad hai, shyd tum bhool gayi hou🤫😣😩😟😟🫥🥺 . .</h1>
+            <button class="proceed-btn" onclick="nextSlide()">Tap for next</button>
+        </div>
+
+        <div class="slide" id="slide13">
+            <p class="sub-message">Pata nahii yeh tumhe, mai kaab send Karunga . . . Umiid karta hu daairr na hojaaye . . . 😢</p>
+            <p class="sub-message">Inn slide ko dekhna kai liya . . .</p>
+            <h1 class="main-message">ThankKKKKK youuuuu sooooooo mucchhhhhhhh . . . .</h1>
+            
+            <div class="action-emoji" onclick="specialAction('finalHeart')">❤️</div>
+            <p class="sub-message">Tap the heart</p>
+        </div>
+
+        <div class="slide" id="slide14">
+            <p class="sub-message">Baki Iss mai agr kuch bura lag hou to mafff ker dena. .....bohot dino seh sai kehna chahta tha lykin himmat nahi huwi pata nahiiii... abbb kessaaaa likha ha</p>
+            <h1 class="main-message" style="font-size: 3.5rem;">From <span class="highlight"> your.....() mashook, AnfalAhmedddd</span> ❤️</h1>
+        </div>
+
+    </div>
+
+    <script>
+        let currentSlideIndex = 1;
+        const totalSlides = 14; 
+
+        function showSlide(index) {
+            // Hide the previous active slide
+            const currentActive = document.querySelector('.slide.active');
+            if (currentActive) {
+                currentActive.classList.remove('active');
+            }
+
+            // Show the new slide
+            const targetSlideId = 'slide' + index;
+            const targetSlide = document.getElementById(targetSlideId);
+            if (targetSlide) {
+                targetSlide.classList.add('active');
+                currentSlideIndex = index;
+            }
+        }
+
+        // Generic navigation
+        function nextSlide() {
+            if (currentSlideIndex < totalSlides) {
+                showSlide(currentSlideIndex + 1);
+            }
+        }
+
+        // --- Handle Special Logic ---
+
+        function specialAction(type) {
+            if (type === 'cross') {
+                // If she taps ❌ on Slide 5, show the "cring" loop slide
+                document.getElementById('slide5').classList.remove('active');
+                document.getElementById('slide5_loop').classList.add('active');
+            } else if (type === 'backTo5') {
+                // Return to Slide 5 from the loop
+                document.getElementById('slide5_loop').classList.remove('active');
+                document.getElementById('slide5').classList.add('active');
+                currentSlideIndex = 5; 
+            } else if (type === 'proceedTo6') {
+                // Proceed normally to Slide 6
+                showSlide(6);
+            } else if (type === 'showHeart') {
+                // Trigger Slide 10 (Photo Reveal)
+                showSlide(10);
+                setTimeout(() => {
+                    document.getElementById('photoFrame').style.opacity = '1';
+                }, 500); // Small delay for effect
+            } else if (type === 'finalHeart') {
+                // Final reveal
+                showSlide(14);
+            }
+        }
+
+        // Slide 7 (Cuteness Meter) Animation
+        function startMeter() {
+            const bar = document.getElementById('cutenessBar');
+            const exceededText = document.getElementById('exceededText');
+            const proceedBtn = document.getElementById('slide7proceed');
+
+            bar.style.width = '100%'; // Trigger the fill animation
+            
+            // Text fade in after 2.5 seconds (defined in CSS transition)
+            exceededText.style.opacity = '1';
+
+            // Show the next button after the overflow text is visible
+            setTimeout(() => {
+                proceedBtn.style.display = 'inline-block';
+            }, 3500); 
+        }
+
+    </script>
+</body>
+</html>
